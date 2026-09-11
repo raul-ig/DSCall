@@ -1,0 +1,59 @@
+# ---------------------------------------------------------------------------
+# MCP.DSCall — arquivos fora do controle de versao
+# ---------------------------------------------------------------------------
+
+# Configuracao local — contem a senha do DataSnap e os servidores do operador.
+# O esqueleto e gerado pelo proprio exe na primeira execucao.
+MCP.DSCall.json
+exe/MCP.DSCall.json
+*.dev.json
+
+# Saida do build
+exe/
+dcu/
+dcp/
+*.exe
+*.old.exe
+
+# Resource gerado pelo compilador (refeito a cada build, muda com o VerInfo)
+*.res
+*.RES
+
+# Artefatos do compilador Delphi
+*.dcu
+*.dcp
+*.dcpil
+*.dpu
+*.o
+*.obj
+*.identcache
+*.local
+*.stat
+*.tvsconfig
+*.drc
+*.map
+*.rsm
+
+# Historico e recuperacao da IDE
+__history/
+__recovery/
+**/__history/
+**/__recovery/
+
+# Arquivos de usuario do RAD Studio
+*.dproj.local
+*.groupproj.local
+*.~*~
+*.bak
+*.tmp
+*.$$$
+
+# Log de runtime
+*.log
+
+# Windows / editores
+*.lnk
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/

@@ -1,0 +1,55 @@
+# ---------------------------------------------------------------------------
+# Normalizacao de fim de linha e tratamento binario.
+#
+# O ecossistema Delphi e integralmente Windows: a IDE, o compilador e os
+# scripts .cmd esperam CRLF. Um .cmd com LF puro faz o cmd.exe quebrar linhas
+# no meio e reclamar de comandos inexistentes — ja aconteceu neste projeto.
+# Por isso a normalizacao aqui e explicita e nao depende de core.autocrlf
+# de cada maquina.
+# ---------------------------------------------------------------------------
+
+# Padrao: detectar texto e gravar CRLF no working tree.
+* text=auto eol=crlf
+
+# --- Fontes e projeto Delphi ------------------------------------------------
+*.pas   text eol=crlf diff=pascal
+*.dpr   text eol=crlf diff=pascal
+*.dpk   text eol=crlf diff=pascal
+*.inc   text eol=crlf diff=pascal
+*.dfm   text eol=crlf
+*.fmx   text eol=crlf
+*.dproj text eol=crlf
+*.groupproj text eol=crlf
+
+# --- Scripts (CRLF obrigatorio) ---------------------------------------------
+*.cmd text eol=crlf
+*.bat text eol=crlf
+*.ps1 text eol=crlf
+
+# --- Documentacao e configuracao --------------------------------------------
+*.md   text eol=crlf
+*.json text eol=crlf
+*.xml  text eol=crlf
+*.yml  text eol=crlf
+*.sql  text eol=crlf
+
+# --- Binarios: nunca converter nem tentar diff ------------------------------
+*.res   binary
+*.RES   binary
+*.dcu   binary
+*.dcp   binary
+*.bpl   binary
+*.exe   binary
+*.dll   binary
+*.ico   binary
+*.png   binary
+*.jpg   binary
+*.bmp   binary
+*.gif   binary
+*.xcf   binary
+*.pdf   binary
+*.zip   binary
+
+# --- Estatisticas do repositorio --------------------------------------------
+# REST.API.pas e copia de biblioteca interna, nao codigo autoral deste projeto.
+src/util/REST.API.pas linguist-vendored
