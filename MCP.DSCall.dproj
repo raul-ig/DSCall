@@ -53,10 +53,13 @@
         <DCC_F>false</DCC_F>
         <DCC_K>false</DCC_K>
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
+        <DCC_UnitSearchPath>src\jose;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_IncludePath>src\jose;$(DCC_IncludePath)</DCC_IncludePath>
         <SanitizedProjectName>MCP_DSCall</SanitizedProjectName>
         <VerInfo_Locale>1046</VerInfo_Locale>
-        <VerInfo_Keys>CompanyName=Irmãos Gonçalves Comércio e Indústria LTDA;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+        <VerInfo_Keys>CompanyName=Irmãos Gonçalves Comércio e Indústria LTDA;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.1;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <VerInfo_Build>1</VerInfo_Build>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Linux64)'!=''">
         <DCC_UsePackage>DataSnapServer;fmx;emshosting;DbxCommonDriver;bindengine;FireDACCommonODBC;emsclient;FireDACCommonDriver;IndyProtocols;dbxcds;emsedge;inetdb;FireDACSqliteDriver;DbxClientDriver;FireDACASADriver;soapmidas;dbexpress;FireDACInfxDriver;inet;DataSnapCommon;dbrtl;FireDACOracleDriver;CustomIPTransport;FireDACMSSQLDriver;DataSnapIndy10ServerTransport;DataSnapConnectors;FireDACMongoDBDriver;IndySystem;FireDACTDataDriver;bindcomp;FireDACCommon;DataSnapServerMidas;FireDACODBCDriver;emsserverresource;IndyCore;RESTBackendComponents;rtl;FireDACMySQLDriver;FireDACADSDriver;RESTComponents;dsnapxml;DataSnapClient;DataSnapFireDAC;emsclientfiredac;FireDACPgDriver;FireDAC;xmlrtl;dsnap;CloudService;FireDACDb2Driver;DataSnapNativeClient;DatasnapConnectorsFreePascal;soaprtl;soapserver;FireDACIBDriver;$(DCC_UsePackage)</DCC_UsePackage>
@@ -94,8 +97,8 @@
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
-        <DCC_DcuOutput>\dcu</DCC_DcuOutput>
-        <DCC_ExeOutput>\exe</DCC_ExeOutput>
+        <DCC_DcuOutput>.\dcu</DCC_DcuOutput>
+        <DCC_ExeOutput>.\exe</DCC_ExeOutput>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
@@ -121,12 +124,23 @@
         <DCCReference Include="src\ds\MCP.DSCall.Log.pas"/>
         <DCCReference Include="src\ds\MCP.DSCall.Introspec.pas"/>
         <DCCReference Include="src\ds\MCP.DSCall.Invoke.pas"/>
+        <DCCReference Include="src\ds\MCP.DSCall.Dataset.pas"/>
+        <DCCReference Include="src\rest\MCP.DSCall.Rest.pas"/>
+        <DCCReference Include="src\rest\MCP.DSCall.Rest.Catalogo.pas"/>
         <DCCReference Include="src\tools\MCP.DSCall.Tool.Servers.pas"/>
         <DCCReference Include="src\tools\MCP.DSCall.Tool.Classes.pas"/>
         <DCCReference Include="src\tools\MCP.DSCall.Tool.DescribeClass.pas"/>
         <DCCReference Include="src\tools\MCP.DSCall.Tool.DescribeMethod.pas"/>
         <DCCReference Include="src\tools\MCP.DSCall.Tool.Call.pas"/>
         <DCCReference Include="src\tools\MCP.DSCall.Tool.SqlLog.pas"/>
+        <DCCReference Include="src\tools\MCP.DSCall.Tool.Providers.pas"/>
+        <DCCReference Include="src\tools\MCP.DSCall.Tool.Dataset.pas"/>
+        <DCCReference Include="src\tools\MCP.DSCall.Tool.RestApis.pas"/>
+        <DCCReference Include="src\tools\MCP.DSCall.Tool.CatalogList.pas"/>
+        <DCCReference Include="src\tools\MCP.DSCall.Tool.CatalogGet.pas"/>
+        <DCCReference Include="src\tools\MCP.DSCall.Tool.CatalogSet.pas"/>
+        <DCCReference Include="src\tools\MCP.DSCall.Tool.CatalogDelete.pas"/>
+        <DCCReference Include="src\tools\MCP.DSCall.Tool.RestCall.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
