@@ -22,7 +22,8 @@ type
     ['{D6410B27-53AE-4F19-8C60-72B9E3A5148F}']
     function Chamar(const ANomeServidor, AMetodo: String; const APosicionais: TArray<String>;
                     const ANomeados: TJSONObject; const AComSQL: Boolean): String;
-    function LogSQL(const ANomeServidor: String; const ALimpar: Boolean; const AMax: Integer): String;
+    function LogSQL(const ANomeServidor: String; const ALimpar: Boolean; const AMax: Integer;
+                    const AFiltro: String; const ADesdeId: Integer): String;
   end;
 
   TDSInvoke = class(TInterfacedObject, IDSInvoke)
@@ -34,7 +35,8 @@ type
 
     function Chamar(const ANomeServidor, AMetodo: String; const APosicionais: TArray<String>;
                     const ANomeados: TJSONObject; const AComSQL: Boolean): String;
-    function LogSQL(const ANomeServidor: String; const ALimpar: Boolean; const AMax: Integer): String;
+    function LogSQL(const ANomeServidor: String; const ALimpar: Boolean; const AMax: Integer;
+                    const AFiltro: String; const ADesdeId: Integer): String;
   end;
 
 implementation
@@ -161,14 +163,15 @@ begin
         Result := Result + sLineBreak + sAvisoLog;
 
       Result := Result + sLineBreak + '--- SQL ---' + sLineBreak +
-                FLog.Listar(Servidor, FConexoes.Config.MCP.SqlLogMax);
+                FLog.Listar(Servidor, FConexoes.Config.MCP.SqlLogMax, '', 0);
     end;
   finally
     FreeAndNil(Comando);
   end;
 end;
 
-function TDSInvoke.LogSQL(const ANomeServidor: String; const ALimpar: Boolean; const AMax: Integer): String;
+function TDSInvoke.LogSQL(const ANomeServidor: String; const ALimpar: Boolean; const AMax: Integer;
+  const AFiltro: String; const ADesdeId: Integer): String;
 var
   Servidor : TDSServerConfig;
   iMax     : Integer;
@@ -189,7 +192,7 @@ begin
   if iMax <= 0 then
     iMax := FConexoes.Config.MCP.SqlLogMax;
 
-  Result := FLog.Listar(Servidor, iMax);
+  Result := FLog.Listar(Servidor, iMax, AFiltro, ADesdeId);
 end;
 
 end.

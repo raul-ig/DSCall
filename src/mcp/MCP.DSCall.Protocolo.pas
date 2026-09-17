@@ -38,10 +38,10 @@ type
     destructor  Destroy; override;
 
     function Texto     (const ANome, ADescricao: String; const AObrigatorio: Boolean = False): TSchema;
-    function Booleano  (const ANome, ADescricao: String): TSchema;
-    function Inteiro   (const ANome, ADescricao: String): TSchema;
-    function Objeto    (const ANome, ADescricao: String): TSchema;
-    function ListaTexto(const ANome, ADescricao: String): TSchema;
+    function Booleano  (const ANome, ADescricao: String; const AObrigatorio: Boolean = False): TSchema;
+    function Inteiro   (const ANome, ADescricao: String; const AObrigatorio: Boolean = False): TSchema;
+    function Objeto    (const ANome, ADescricao: String; const AObrigatorio: Boolean = False): TSchema;
+    function ListaTexto(const ANome, ADescricao: String; const AObrigatorio: Boolean = False): TSchema;
 
     // Monta o objeto final e o entrega ao chamador; a instancia se autolibera.
     function Build: TJSONObject;
@@ -108,22 +108,22 @@ begin
   Result := Propriedade(ANome, 'string', ADescricao, AObrigatorio);
 end;
 
-function TSchema.Booleano(const ANome, ADescricao: String): TSchema;
+function TSchema.Booleano(const ANome, ADescricao: String; const AObrigatorio: Boolean): TSchema;
 begin
-  Result := Propriedade(ANome, 'boolean', ADescricao, False);
+  Result := Propriedade(ANome, 'boolean', ADescricao, AObrigatorio);
 end;
 
-function TSchema.Inteiro(const ANome, ADescricao: String): TSchema;
+function TSchema.Inteiro(const ANome, ADescricao: String; const AObrigatorio: Boolean): TSchema;
 begin
-  Result := Propriedade(ANome, 'integer', ADescricao, False);
+  Result := Propriedade(ANome, 'integer', ADescricao, AObrigatorio);
 end;
 
-function TSchema.Objeto(const ANome, ADescricao: String): TSchema;
+function TSchema.Objeto(const ANome, ADescricao: String; const AObrigatorio: Boolean): TSchema;
 begin
-  Result := Propriedade(ANome, 'object', ADescricao, False);
+  Result := Propriedade(ANome, 'object', ADescricao, AObrigatorio);
 end;
 
-function TSchema.ListaTexto(const ANome, ADescricao: String): TSchema;
+function TSchema.ListaTexto(const ANome, ADescricao: String; const AObrigatorio: Boolean): TSchema;
 var
   Campo : TJSONObject;
   Itens : TJSONObject;
@@ -137,6 +137,9 @@ begin
   Campo.AddPair('description', ADescricao);
 
   FPropriedades.AddPair(ANome, Campo);
+
+  if AObrigatorio then
+    FObrigatorios.Add(ANome);
 
   Result := Self;
 end;

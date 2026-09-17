@@ -209,7 +209,7 @@ Contra o MD007 em DEV, com os resultados já verificados:
 
 ## Atualização automática
 
-No startup, antes de subir o loop MCP, consulta o servidor de distribuição interno (`http://10.0.2.228:8016`) com `project=MCP.DSCall` e baixa uma versão mais nova se houver. A nova versão só é exercida na **próxima** execução. Falhas são silenciadas (stderr) e não impedem o servidor de subir.
+No startup, antes de subir o loop MCP, consulta o servidor de distribuição interno (`http://127.0.0.1:8016`) com `project=MCP.DSCall` e baixa uma versão mais nova se houver. A nova versão só é exercida na **próxima** execução. Falhas são silenciadas (stderr) e não impedem o servidor de subir.
 
 O `FileVersion` no `VerInfo` do `.dproj` está em `1.0.0.0` — atualizar **manualmente** ao publicar uma nova versão.
 

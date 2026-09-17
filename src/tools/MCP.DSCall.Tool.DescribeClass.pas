@@ -55,7 +55,7 @@ function TToolDescribeClass.Schema: TJSONObject;
 begin
   Result := TSchema.Create
     .Texto('class', 'Nome da classe, ex TSM0977A.', True)
-    .Texto('server', ARG_SERVER)
+    .Texto('server', ARG_SERVER, True)
     .Booleano('all', 'true inclui os metodos herdados de TServerModuleBase. Default false.')
     .Build;
 end;

@@ -26,7 +26,23 @@ uses
   REST.API;
 
 const
+  // Servidor de distribuicao das versoes.
+  //
+  // RELEASE aponta para PRODUCAO de proposito: e de la que o exe publicado se
+  // atualiza, e amarrar isso no fonte garante que o binario entregue busque o
+  // lugar certo sem depender de configuracao na maquina do usuario.
+  //
+  // DEBUG aponta para a maquina local porque este GET roda a CADA execucao do
+  // MCP: sem essa separacao, toda sessao de desenvolvimento bateria em producao
+  // sem ninguem perceber — foi o que aconteceu antes desta diretiva existir.
+  //
+  // Consequencia pratica: build de teste tem de ser DEBUG. O build.cmd usa Debug
+  // por padrao e so gera Release quando pedido explicitamente ("build.cmd release").
+{$IFDEF DEBUG}
+  MD016 = 'http://127.0.0.1:8016';
+{$ELSE}
   MD016 = 'http://10.0.2.228:8016';
+{$ENDIF}
   PROJETO = 'MCP.DSCall';
 
 function FileVersion(FileName: String): String;

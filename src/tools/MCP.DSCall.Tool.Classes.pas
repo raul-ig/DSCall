@@ -51,7 +51,7 @@ end;
 function TToolClasses.Schema: TJSONObject;
 begin
   Result := TSchema.Create
-    .Texto('server', ARG_SERVER)
+    .Texto('server', ARG_SERVER, True)
     .Texto('filter', 'Substring case-insensitive para filtrar os nomes de classe.')
     .Build;
 end;

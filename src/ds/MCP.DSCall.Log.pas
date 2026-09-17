@@ -23,8 +23,14 @@ type
     ['{A31C7F58-4E96-4B02-9D7A-63E0158BC274}']
     // Limpa o log do servidor. Devolve '' em sucesso ou a mensagem de erro.
     function Limpar(const AServer: TDSServerConfig): String;
-    // Scripts recentes em markdown compacto, limitados aos AMax mais recentes.
-    function Listar(const AServer: TDSServerConfig; const AMax: Integer): String;
+    // Scripts recentes em markdown compacto.
+    //   AMax     — quantos dos mais recentes trazer (0 = todos os que sobrarem)
+    //   AFiltro  — substring case-insensitive; casa em SCRIPT ou PARAMETROS
+    //   ADesdeId — so registros com ID maior que este (0 = sem corte)
+    // O rodape sempre informa o ultimo ID, para servir de ADesdeId da proxima
+    // chamada — e assim acompanhar so o que e novo.
+    function Listar(const AServer: TDSServerConfig; const AMax: Integer;
+                    const AFiltro: String; const ADesdeId: Integer): String;
   end;
 
   TDSLog = class(TInterfacedObject, IDSLog)
@@ -37,7 +43,8 @@ type
     function DataCurta(const AISO: String): String;
   public
     function Limpar(const AServer: TDSServerConfig): String;
-    function Listar(const AServer: TDSServerConfig; const AMax: Integer): String;
+    function Listar(const AServer: TDSServerConfig; const AMax: Integer;
+                    const AFiltro: String; const ADesdeId: Integer): String;
   end;
 
 implementation
@@ -129,7 +136,8 @@ begin
   end;
 end;
 
-function TDSLog.Listar(const AServer: TDSServerConfig; const AMax: Integer): String;
+function TDSLog.Listar(const AServer: TDSServerConfig; const AMax: Integer;
+  const AFiltro: String; const ADesdeId: Integer): String;
 var
   API     : TRESTAPI;
   Lista   : TJSONArray;
@@ -138,7 +146,13 @@ var
   iInicio : Integer;
   iIndice : Integer;
   iTotal  : Integer;
+  iId     : Integer;
+  iLinha  : Integer;
+  iUltimoId    : Integer;
+  Selecionados : TArray<Integer>;
+  sFiltro : String;
   sScript : String;
+  sParams : String;
 begin
   API := TRESTAPI.Create;
   try
@@ -153,22 +167,57 @@ begin
 
       Lista := API.Response.ToJSONArray;
       if (Lista = nil) or (Lista.Count = 0) then
-        Exit('[0 linhas]');
+        Exit('[0 linhas] ultimo_id=0');
 
-      // Os mais recentes ficam no fim do array; trazer so a cauda pedida.
-      iTotal  := Lista.Count;
+      sFiltro   := AFiltro.Trim.ToUpper;
+      iUltimoId := 0;
+      SetLength(Selecionados, 0);
+
+      // Passo 1 — seleciona por ADesdeId e AFiltro. O corte por AMax so pode
+      // vir DEPOIS do filtro, senao "os 20 mais recentes" viraria "os que
+      // sobraram dos 20 ultimos", que e outra coisa.
+      for iIndice := 0 to Lista.Count - 1 do
+      begin
+        if not (Lista.Items[iIndice] is TJSONObject) then
+          Continue;
+
+        Item := TJSONObject(Lista.Items[iIndice]);
+        iId  := StrToIntDef(CampoTexto(Item, 'ID'), 0);
+
+        // O maior ID do log INTEIRO e o ponto de corte temporal, mesmo quando
+        // o filtro descarta o ultimo registro.
+        if iId > iUltimoId then
+          iUltimoId := iId;
+
+        if (ADesdeId > 0) and (iId <= ADesdeId) then
+          Continue;
+
+        if sFiltro <> '' then
+        begin
+          sScript := CampoTexto(Item, 'SCRIPT');
+          sParams := CampoTexto(Item, 'PARAMETROS');
+
+          if not (sScript.ToUpper.Contains(sFiltro) or sParams.ToUpper.Contains(sFiltro)) then
+            Continue;
+        end;
+
+        Selecionados := Selecionados + [iIndice];
+      end;
+
+      if Length(Selecionados) = 0 then
+        Exit(Format('[0 linhas] ultimo_id=%d', [iUltimoId]));
+
+      // Passo 2 — os mais recentes ficam no fim; trazer so a cauda pedida.
+      iTotal  := Length(Selecionados);
       iInicio := 0;
       if (AMax > 0) and (iTotal > AMax) then
         iInicio := iTotal - AMax;
 
       Tabela := TTabela.Nova(['ID', 'DATA', 'TAMANHO', 'PARAMETROS', 'SCRIPT']);
 
-      for iIndice := iInicio to iTotal - 1 do
+      for iLinha := iInicio to iTotal - 1 do
       begin
-        if not (Lista.Items[iIndice] is TJSONObject) then
-          Continue;
-
-        Item := TJSONObject(Lista.Items[iIndice]);
+        Item := TJSONObject(Lista.Items[Selecionados[iLinha]]);
 
         // Teto por script: um SELECT gerado pode ter dezenas de KB e nao ha
         // ganho em despejar tudo no contexto do agente.
@@ -184,10 +233,10 @@ begin
           sScript]);
       end;
 
-      Result := Tabela.ToString;
+      Result := Tabela.ToString + Format(' ultimo_id=%d', [iUltimoId]);
 
       if iInicio > 0 then
-        Result := Result + Format(' (%d mais antigas omitidas)', [iInicio]);
+        Result := Result + Format(' (%d anteriores omitidas pelo max)', [iInicio]);
     except
       on E: Exception do
         Result := 'ERRO: nao foi possivel ler o log em ' + UrlBase(AServer) + ': ' + E.Message;

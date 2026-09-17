@@ -13,6 +13,7 @@ program MCP.DSCall;
 uses
   System.SysUtils,
   Winapi.Windows,
+  System.IOUtils,
   Data.DB,
   Data.SqlExpr,
   Data.DBXCommon,
@@ -33,12 +34,23 @@ uses
   MCP.DSCall.Log                  in 'src\ds\MCP.DSCall.Log.pas',
   MCP.DSCall.Introspec            in 'src\ds\MCP.DSCall.Introspec.pas',
   MCP.DSCall.Invoke               in 'src\ds\MCP.DSCall.Invoke.pas',
+  MCP.DSCall.Dataset              in 'src\ds\MCP.DSCall.Dataset.pas',
+  MCP.DSCall.Rest                 in 'src\rest\MCP.DSCall.Rest.pas',
+  MCP.DSCall.Rest.Catalogo        in 'src\rest\MCP.DSCall.Rest.Catalogo.pas',
   MCP.DSCall.Tool.Servers         in 'src\tools\MCP.DSCall.Tool.Servers.pas',
   MCP.DSCall.Tool.Classes         in 'src\tools\MCP.DSCall.Tool.Classes.pas',
   MCP.DSCall.Tool.DescribeClass   in 'src\tools\MCP.DSCall.Tool.DescribeClass.pas',
   MCP.DSCall.Tool.DescribeMethod  in 'src\tools\MCP.DSCall.Tool.DescribeMethod.pas',
   MCP.DSCall.Tool.Call            in 'src\tools\MCP.DSCall.Tool.Call.pas',
-  MCP.DSCall.Tool.SqlLog          in 'src\tools\MCP.DSCall.Tool.SqlLog.pas';
+  MCP.DSCall.Tool.SqlLog          in 'src\tools\MCP.DSCall.Tool.SqlLog.pas',
+  MCP.DSCall.Tool.Providers       in 'src\tools\MCP.DSCall.Tool.Providers.pas',
+  MCP.DSCall.Tool.Dataset         in 'src\tools\MCP.DSCall.Tool.Dataset.pas',
+  MCP.DSCall.Tool.RestApis        in 'src\tools\MCP.DSCall.Tool.RestApis.pas',
+  MCP.DSCall.Tool.CatalogList     in 'src\tools\MCP.DSCall.Tool.CatalogList.pas',
+  MCP.DSCall.Tool.CatalogGet      in 'src\tools\MCP.DSCall.Tool.CatalogGet.pas',
+  MCP.DSCall.Tool.CatalogSet      in 'src\tools\MCP.DSCall.Tool.CatalogSet.pas',
+  MCP.DSCall.Tool.CatalogDelete   in 'src\tools\MCP.DSCall.Tool.CatalogDelete.pas',
+  MCP.DSCall.Tool.RestCall        in 'src\tools\MCP.DSCall.Tool.RestCall.pas';
 
 {$R *.res}
 
@@ -54,6 +66,9 @@ var
   Log        : IDSLog;
   Introspec  : IDSIntrospec;
   Invoke     : IDSInvoke;
+  Dataset    : IDSDataset;
+  Rest       : IRestClient;
+  Catalogo   : ICatalogoRotas;
   Registro   : TMCPRegistroTools;
   Servidor   : TMCPServer;
 
@@ -87,14 +102,29 @@ begin
       Log       := TDSLog.Create;
       Introspec := TDSIntrospec.Create(Conexoes);
       Invoke    := TDSInvoke.Create(Conexoes, Log);
+      Dataset   := TDSDataset.Create(Conexoes);
+      // Camada REST: independente do DataSnap, so depende do config.
+      Rest      := TRestClient.Create(Config);
+      // Catalogo no mesmo nivel do MCP.DSCall.json: e dado do operador, como a
+      // configuracao, e acompanha a instalacao.
+      Catalogo  := TCatalogoRotas.Create(
+                     TPath.Combine(TPath.GetDirectoryName(ConfigFileName), 'rest_call'));
 
       Registro := TMCPRegistroTools.Create;
       Registro.Registrar(TToolServers.Create(Introspec));
       Registro.Registrar(TToolClasses.Create(Introspec));
       Registro.Registrar(TToolDescribeClass.Create(Introspec));
       Registro.Registrar(TToolDescribeMethod.Create(Introspec));
+      Registro.Registrar(TToolProviders.Create(Dataset));
+      Registro.Registrar(TToolDataset.Create(Dataset));
       Registro.Registrar(TToolCall.Create(Invoke));
       Registro.Registrar(TToolSqlLog.Create(Invoke));
+      Registro.Registrar(TToolRestApis.Create(Rest));
+      Registro.Registrar(TToolCatalogList.Create(Catalogo));
+      Registro.Registrar(TToolCatalogGet.Create(Catalogo));
+      Registro.Registrar(TToolCatalogSet.Create(Catalogo));
+      Registro.Registrar(TToolCatalogDelete.Create(Catalogo));
+      Registro.Registrar(TToolRestCall.Create(Rest));
 
       // Bloqueia ate EOF do cliente.
       Servidor := TMCPServer.Create(Transporte, Registro, SERVER_NAME, SERVER_TITLE, SERVER_VERSION);

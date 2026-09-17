@@ -28,8 +28,35 @@ const
 
   // Descricao do argumento "server", repetido em todas as tools.
   ARG_SERVER =
-    'Nome do servidor no MCP.DSCall.json (ex MD007, MD029). Omitido = o marcado como default. ' +
-    'Nomes fora do config sao recusados — o array de servidores e a allowlist.';
+    'OBRIGATORIO. Nome do servidor no MCP.DSCall.json (ex MD007, MD029). ' +
+    'NAO existe servidor padrao: a escolha e sempre explicita, porque o protocolo e identico em ' +
+    'DEV e producao e um alvo assumido por omissao so apareceria depois do efeito. ' +
+    'Use ds_servers para ver os cadastrados; nomes fora do config sao recusados.';
+
+  // Formato de uma rota no catalogo. Repetido nas descricoes das tools de
+  // catalogo para que qualquer cliente MCP saiba preencher sem adivinhar.
+  CATALOGO_FORMATO =
+    ' FORMATO DA ROTA (objeto JSON): ' +
+    '{"verbo":"GET|POST|PUT|DELETE", ' +
+    '"descricao":"o que a rota faz, em uma frase", ' +
+    '"efeito":"leitura|escrita|processamento", ' +
+    '"query":[{"nome":"...","tipo":"string|integer|boolean|date","obrigatorio":true,"exemplo":"...","descricao":"..."}], ' +
+    '"body":"exemplo do corpo JSON, quando houver", ' +
+    '"resposta":"exemplo da resposta, quando conhecido", ' +
+    '"observacoes":"o que surpreenderia quem chama a rota pela primeira vez", ' +
+    '"status":"rascunho|validado"}. ' +
+    'O campo EFEITO e o mais importante e nao pode ser deduzido do verbo: nestas APIs existe rota GET ' +
+    'que PROCESSA (gera documento, dispara integracao). Marque "processamento" sempre que a rota fizer ' +
+    'mais do que devolver dados, e "escrita" quando ela alterar cadastro. Na duvida, NAO marque leitura. ' +
+    'STATUS: use "rascunho" enquanto a rota foi apenas lida de um fonte ou inferida, e "validado" somente ' +
+    'depois de ter sido chamada com sucesso — assim quem consulta o catalogo sabe em que confiar.';
+
+  // Politica de execucao das tools REST.
+  REST_CONFIRMACAO =
+    ' NUNCA CHAME UMA ROTA SEM PEDIDO EXPLICITO DO USUARIO. Nao chame para "conferir", "validar" ou ' +
+    '"testar se funciona" por iniciativa propria, e nao encadeie chamadas a partir de um resultado. ' +
+    'O verbo GET NAO garante leitura nestas APIs: ha rotas GET que processam e geram efeito real. ' +
+    'Na duvida, pergunte ao usuario antes de executar.';
 
 implementation
 

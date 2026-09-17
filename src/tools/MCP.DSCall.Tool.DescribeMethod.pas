@@ -55,7 +55,7 @@ function TToolDescribeMethod.Schema: TJSONObject;
 begin
   Result := TSchema.Create
     .Texto('method', 'Metodo no formato TClasse.Metodo, ex TSM0977A.RotasAtivasDoCAR.', True)
-    .Texto('server', ARG_SERVER)
+    .Texto('server', ARG_SERVER, True)
     .Build;
 end;
 

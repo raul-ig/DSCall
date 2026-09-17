@@ -60,7 +60,7 @@ begin
     .Objeto('named', 'Parametros por nome, conforme ds_describe_method. Tem precedencia sobre params.')
     .Booleano('com_sql', 'true limpa o log do servidor, executa e devolve os SQLs gerados apos --- SQL ---. ' +
                          'Exige servidor compilado em DEBUG.')
-    .Texto('server', ARG_SERVER)
+    .Texto('server', ARG_SERVER, True)
     .Build;
 end;
 

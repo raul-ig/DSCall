@@ -44,7 +44,11 @@ function TToolSqlLog.Descricao: String;
 begin
   Result :=
     'Scripts SQL executados recentemente pelo servidor (rota HTTP /log/listar das classes TWeb). ' +
-    'E a forma de conferir o SQL que um server method montou. ' +
+    'O log e GLOBAL do servidor: captura o SQL de TODAS as sessoes, inclusive o da tela do cliente ' +
+    'Delphi (MD009) — e por isso a forma de acompanhar o que esta acontecendo sem instrumentar nada. ' +
+    'O SCRIPT vem carimbado com a origem no formato /* TClasse USUARIO */. ' +
+    'PARA ACOMPANHAR UMA OPERACAO: chame uma vez, anote o ultimo_id do rodape, peca ao usuario para ' +
+    'executar a acao na tela, e chame de novo com desde_id=<aquele valor> — voltam so os SQLs novos. ' +
     'So existe em build DEBUG do servidor — confira a coluna BUILD em ds_servers. ' +
     'Colunas: ID, DATA, TAMANHO, PARAMETROS, SCRIPT.' +
     FORMATO_RESPOSTA;
@@ -53,9 +57,14 @@ end;
 function TToolSqlLog.Schema: TJSONObject;
 begin
   Result := TSchema.Create
-    .Texto('server', ARG_SERVER)
+    .Texto('server', ARG_SERVER, True)
     .Booleano('limpar', 'true zera o log ANTES de listar — use para isolar o efeito da proxima chamada.')
-    .Inteiro('max', 'Quantos scripts mais recentes trazer. Default sql_log_max do config.')
+    .Inteiro('max', 'Quantos scripts mais recentes trazer, DEPOIS de aplicar filter e desde_id. ' +
+                    'Default sql_log_max do config.')
+    .Texto('filter', 'Substring case-insensitive; casa em SCRIPT ou PARAMETROS. ' +
+                     'Use o nome da tabela (ex T1G0) ou da rotina (ex TSM0977A) para isolar o que interessa.')
+    .Inteiro('desde_id', 'So registros com ID MAIOR que este. Passe o ultimo_id devolvido na chamada ' +
+                         'anterior para ver apenas o que aconteceu desde entao.')
     .Build;
 end;
 
@@ -64,7 +73,9 @@ begin
   Result := FInvoke.LogSQL(
     ArgServidor(AArgs),
     ArgBooleano(AArgs, 'limpar'),
-    ArgInteiro(AArgs, 'max'));
+    ArgInteiro(AArgs, 'max'),
+    ArgTexto(AArgs, 'filter'),
+    ArgInteiro(AArgs, 'desde_id'));
 end;
 
 end.

@@ -2,12 +2,17 @@
 rem ---------------------------------------------------------------------------
 rem  Build do MCP.DSCall (Delphi 11 Alexandria / BDS 22.0)
 rem
-rem  Gera exe\MCP.DSCall.exe — Release, Win32, console. Nao instala nada no
-rem  Delphi: o projeto e um executavel isolado, sem package nem componente.
+rem  Uso: build.cmd            compila DEBUG   (padrao — para desenvolver/testar)
+rem       build.cmd release    compila RELEASE (para publicar)
 rem
-rem  Para publicar o binario onde o Claude o encontra, rode install.cmd depois.
+rem  POR QUE DEBUG E O PADRAO: a constante MD016 (servidor de auto-update) muda
+rem  conforme a diretiva. Em RELEASE ela aponta para PRODUCAO, porque o exe
+rem  publicado precisa se atualizar de la. Como esse GET roda a cada execucao do
+rem  MCP, compilar Release para testar faria toda sessao de teste bater em
+rem  producao. Por isso o padrao aqui e Debug, e Release exige ser pedido.
 rem
-rem  Uso: build.cmd
+rem  Gera exe\MCP.DSCall.exe. Nao instala nada no Delphi: o projeto e um
+rem  executavel isolado, sem package nem componente.
 rem
 rem  NOTA: as checagens usam "goto" em vez de blocos "if (...)" de proposito.
 rem  O caminho do RAD Studio contem "(x86)" e o cmd expande as variaveis ao
@@ -20,6 +25,11 @@ set "ROOT=C:\Program Files (x86)\Embarcadero\Studio\22.0"
 set "BASE=%~dp0"
 set "PROJETO=%BASE%MCP.DSCall.dproj"
 set "SAIDA=%BASE%exe\MCP.DSCall.exe"
+
+set "CONFIG=Debug"
+set "DISTRIB=127.0.0.1:8016 (local)"
+if /I "%~1"=="release" set "CONFIG=Release"
+if /I "%~1"=="release" set "DISTRIB=10.0.2.228:8016 (PRODUCAO)"
 
 if not exist "%ROOT%\bin\rsvars.bat" goto :sem_delphi
 if not exist "%PROJETO%" goto :sem_projeto
@@ -35,17 +45,26 @@ echo [1/2] Preparando o ambiente do compilador...
 call "%ROOT%\bin\rsvars.bat" >nul
 if errorlevel 1 goto :sem_rsvars
 
-echo [2/2] Compilando Release^|Win32...
-msbuild "%PROJETO%" /t:Build /p:config=Release /p:platform=Win32 /v:minimal /nologo
+echo [2/2] Compilando %CONFIG%^|Win32...
+msbuild "%PROJETO%" /t:Build /p:config=%CONFIG% /p:platform=Win32 /v:minimal /nologo
 if errorlevel 1 goto :falhou
 
 if not exist "%SAIDA%" goto :sem_saida
 
 echo.
 echo Build OK
-echo   Binario: %SAIDA%
+echo   Binario....: %SAIDA%
+echo   Config.....: %CONFIG%
+echo   Auto-update: %DISTRIB%
 echo.
-echo   Para publicar, rode: install.cmd
+if /I "%CONFIG%"=="Release" goto :aviso_release
+echo   Para publicar, rode: build.cmd release
+endlocal
+exit /b 0
+
+:aviso_release
+echo   ATENCAO: binario de PUBLICACAO. O auto-update deste exe aponta para
+echo            producao. Nao use para testar.
 endlocal
 exit /b 0
 

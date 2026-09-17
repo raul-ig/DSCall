@@ -87,9 +87,16 @@ end;
 
 function TDSConexoes.Resolver(const ANomeServidor: String): TDSServerConfig;
 begin
-  if not FindServer(FConfig, ANomeServidor, Result) then
-    raise Exception.CreateFmt('Servidor "%s" nao esta cadastrado no MCP.DSCall.json. Cadastrados: %s.',
-      [ANomeServidor, NomesServidores(FConfig)]);
+  if FindServer(FConfig, ANomeServidor, Result) then
+    Exit;
+
+  // Distinguir "nao informou" de "informou errado" poupa uma ida e volta.
+  if ANomeServidor.Trim = '' then
+    raise Exception.CreateFmt('Informe o servidor: nao ha padrao. Cadastrados: %s.',
+      [NomesServidores(FConfig)]);
+
+  raise Exception.CreateFmt('Servidor "%s" nao esta cadastrado no MCP.DSCall.json. Cadastrados: %s.',
+    [ANomeServidor, NomesServidores(FConfig)]);
 end;
 
 function TDSConexoes.Abrir(const AServer: TDSServerConfig): TSQLConnection;
